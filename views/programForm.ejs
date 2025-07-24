@@ -1,0 +1,162 @@
+<!-- 
+const data = {
+        idprogram: "",
+        programname: "",
+        idcategory: "",
+        idsubcategory: "",
+        description: "",
+        status: "",
+        casts: "",
+        poster: "",
+        releasedate: "",
+        programcol: ""
+    }
+    res.render('programForm', { data, href: '/program/new' });}) 
+
+-->
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link  rel="stylesheet" href="/stylesheets/formStyle.css" /> 
+    <script src="/javascripts/project.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <form action="<%= href %>" enctype=multipart/form-data method="post">
+    <input type="hidden" value="<%=data.idprogram %>" name="idprogram" />
+  <div class="maincontainer">
+    <div class="box">
+ 
+
+      <!-- <hr color="#6a89cc" style="width: 98%" /> -->
+      <div class="container" style="width: 98%">
+        <div class="row">
+          <div class="col-6">
+            <span>Program Name: </span>
+            <input
+              type="text"
+              required
+              pattern="[a-z A-Z]+"
+              title="Pls Input Alphabets Only"
+              name="programname"
+              class="form-control"
+              placeholder="Employee Name"
+              value="<%=data.programname %>"
+            />
+            </div>
+          </div>
+<!-- idcategory select dropdown -->
+          <div class="row" style="margin-top: 10px">
+            <span>Category: </span>
+            <div class="col-6">
+                <select class="form-select" name="idcategory" id="idcategory">
+                    <option selected value="<%=data.idcategory %>"><%=data.categoryname %></option>
+                
+                </select>
+            </div>
+            <div class="col-6">
+                <div class="col-6">
+                <span>Subcategory: </span>
+                <select class="form-select" name="idsubcategory" id="idsubcategory">
+                    <option selected value="<%=data.idcategory %>"><%=data.subcategoryname %></option>
+                
+                </select>
+            </div>
+        </div>
+        
+        <!-- idsubcategory select dropdown -->
+            <div class="row" style="margin-top: 10px">
+            
+            </div>
+            
+        </div>
+        
+        <!-- status: "", -->
+        <div class="row" style="margin-top: 10px">
+            <div class="col-6">
+            <span>Status: </span>
+            <select required class="form-select" name="status" id="status">
+              <option selected value="<%=data.status %>"><%=data.status %></option>
+              <option>Active</option>
+              <option>Inactive</option>
+            </select>
+          </div>
+            <!-- casts inputbox -->
+            <div class="col-6">
+            <span>Casts: </span>
+            <input
+              type="text"
+              name="casts"
+              class="form-control"
+              placeholder="Casts"
+              value="<%=data.casts %>"
+            />
+          </div>
+        </div>
+        <div class="row" style="margin-top: 10px">
+          <!-- poster inputbox -->
+           <!-- input to add picture from local -->
+            <div class="col-6">
+                <span>Poster: </span>
+                <% if (data.poster) { %>
+        <img src="/images/<%= data.poster %>" alt="Current Poster" width="120" style="margin-bottom:10px;" />
+    <% } %>
+                <input
+                type="file"
+                name="poster"
+                class="form-control"
+                placeholder="Poster URL"
+                value="/images/<%=data.poster %>"
+                />
+          
+          </div>
+          
+<!-- releasedate: ""  -->
+          <div class="col-6">
+            <span>Release Date: </span>
+            <input value="<%=data.releasedate %>"  type="date" name="releasedate" class="form-control" />
+          </div>
+
+          <!-- large description inputbox -->
+            <div class="col-12">
+                <span>Description: </span>
+                <textarea
+                rows="5"
+                type="text-area"
+                name="description"
+                class="form-control"
+                placeholder="Description"
+                value="<%=data.description %>" /></textarea>
+            </div>
+            </div>
+          <!-- submit button -->
+           <div class="row" style="margin-top: 10px">
+          <div class="col-12"  style="display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary" name="btn" value="submit">Submit</button>
+          </div>
+          </div>
+        </div>
+
+          
+
+      </div>
+    </div>
+  </div>
+  </form>
+</html>

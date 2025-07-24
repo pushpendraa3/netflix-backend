@@ -1,0 +1,20 @@
+.card{
+    width: 200px;
+    height: 300px;
+    border: 1px solid #0e0707;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px;
+    display: inline-block;
+    padding: 10px;
+}
+
+.card a{
+    text-decoration: none;
+    color: inherit;
+}
+
+.card img{
+    width: 100%;
+    height: 70%;
+}
