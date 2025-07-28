@@ -24,10 +24,4 @@
     post /login - send emailid password. check ifAuth
     get /dashboard - shows dashboard
     
-    todo: create middleware to check isUserAuth 
-            if isUserAuth == true => Admin dashboard
-            if false then login page
-
-    todo: /logout
-
-    todo: feat: upload videos
+    todo: use uuidv4 for unique video names

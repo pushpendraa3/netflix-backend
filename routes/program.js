@@ -1,22 +1,7 @@
 const express = require('express');
 const pool = require('./pool');
-const multer = require('multer');
+const upload = require('./multer');
 const path = require('path');
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    if (file.fieldname === 'poster') {
-      cb(null, path.join(__dirname, '../public/images'));
-    } else if (file.fieldname === 'video') {
-      cb(null, path.join(__dirname, '../public/videos'));
-    }
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-
-const upload = multer({ storage });
 const { isAuth } = require('./users');
 const router = express.Router();
 
@@ -83,7 +68,10 @@ router.get('/:id', (req, res) => {
   });
 });
 
-router.post('/update/:id', upload.fields([{ name: 'poster', maxCount: 1 }, { name: 'video', maxCount: 1 }]), isAuth, (req, res) => {
+router.post('/update/:id', 
+    upload.fields([{ name: 'poster', maxCount: 1 }, { name: 'video', maxCount: 1 }]), 
+    isAuth, 
+    (req, res) => {
   try {
     const id = req.params.id;
     const { programname, idcategory, idsubcategory, description, status, casts, releasedate } = req.body;
