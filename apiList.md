@@ -13,9 +13,21 @@
     get /delete/:id - deletes data redirects /program/view/all
     post /new - adds new program redirects /program/view/all
 
-    todo: get all categories json
-    todo: get all subcategories within a category json
+    get /categories - json
+    get /subcategories - within a category, json
 
-    
+
 /user
-    / res.send('respond with a resource');
+    get / res.send('respond with a resource');
+
+    get /login - view login
+    post /login - send emailid password. check ifAuth
+    get /dashboard - shows dashboard
+    
+    todo: create middleware to check isUserAuth 
+            if isUserAuth == true => Admin dashboard
+            if false then login page
+
+    todo: /logout
+
+    todo: feat: upload videos

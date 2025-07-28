@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+   <!-- // dashboard with sidebar and main content -->
+    <div class="flex">
+        <aside class="w-1/4 bg-gray-700 text-white p-4" style="height: 100vh;">
+            <h2 class="text-lg font-semibold mb-4">Admin Dashboard</h2>
+            <ul>
+                <li class="mb-2"><a href="/program/view/all" target="frame" class="hover:underline">Home</a></li>
+                <li class="mb-2"><a href="/program/view/new" target="frame" class="hover:underline">Add Program</a></li>
+                <li class="mb-2"><a href="/user/logout" class="hover:underline">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="w-3/4 p-4 pt-12">
+            <div id="main-content">
+                <iframe src="/program/view/all" class="w-full h-[80vh] border rounded" title="All View" name="frame"></iframe>
+                <!-- <iframe src="/employee/display_all" frameborder="0" width="1100" height='600' name="mw"  scrolling="no"> -->
+
+          </iframe>
+            </div>
+           
+        </main>
+    </div>
+</body>
+</html>
+

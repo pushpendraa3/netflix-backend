@@ -18,7 +18,7 @@ const data = {
   <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link  rel="stylesheet" href="/stylesheets/formStyle.css" /> 
-    <script src="/javascripts/project.js"></script>
+    <script src="/javascripts/programForm.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -38,6 +38,10 @@ const data = {
       crossorigin="anonymous"
     ></script>
   </head>
+
+  <body onload="loaded()">
+
+
   <form action="<%= href %>" enctype=multipart/form-data method="post">
     <input type="hidden" value="<%=data.idprogram %>" name="idprogram" />
   <div class="maincontainer">
@@ -52,11 +56,11 @@ const data = {
             <input
               type="text"
               required
-              pattern="[a-z A-Z]+"
-              title="Pls Input Alphabets Only"
+              
+              
               name="programname"
               class="form-control"
-              placeholder="Employee Name"
+              placeholder="Movie Name"
               value="<%=data.programname %>"
             />
             </div>
@@ -65,7 +69,7 @@ const data = {
           <div class="row" style="margin-top: 10px">
             <span>Category: </span>
             <div class="col-6">
-                <select class="form-select" name="idcategory" id="idcategory">
+                <select class="form-select" name="idcategory" id="idcategory" onchange="getSubcategory()">
                     <option selected value="<%=data.idcategory %>"><%=data.categoryname %></option>
                 
                 </select>
@@ -122,11 +126,25 @@ const data = {
                 name="poster"
                 class="form-control"
                 placeholder="Poster URL"
-                value="/images/<%=data.poster %>"
                 />
           
           </div>
-          
+          <div class="col-6">
+            <span>Video: </span>
+            <% if (data.video) { %>
+              <video width="120" controls style="margin-bottom:10px;">
+                <source src="/videos/<%= data.video %>" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            <% } %>
+            <input
+              type="file"
+              name="video"
+              class="form-control"
+              placeholder="Upload Video"
+              accept="video/*"
+            />
+          </div>
 <!-- releasedate: ""  -->
           <div class="col-6">
             <span>Release Date: </span>
@@ -159,4 +177,5 @@ const data = {
     </div>
   </div>
   </form>
+    </body>
 </html>

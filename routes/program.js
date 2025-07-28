@@ -1,168 +1,130 @@
-var express = require('express');
-const pool = require("./pool")
-const upload = require("./multer");
-var router = express.Router();
-// /program
+const express = require('express');
+const pool = require('./pool');
+const multer = require('multer');
+const path = require('path');
 
-
-/* display all programs page */
-router.get('/view/all', function (req, res, next) {
-    res.render('allProgram');
-})
-
-router.get('/view/edit/:id', function (req, res, next) {
-
-    pool.query("SELECT * FROM program WHERE idprogram = ?", [req.params.id], function (error, result) {
-            if (error) {
-                res.status(500).json({ status: false, message: error.message })
-            }
-       
-            res.render('programForm', { data: result[0], href: `/program/update/${req.params.id}` });
-        })
-    
-})
-
-router.get('/view/new', function (req, res, next) {
-    const data = {
-        idprogram: "",
-        programname: "",
-        idcategory: "",
-        idsubcategory: "",
-        description: "",
-        status: "",
-        casts: "",
-        poster: "",
-        releasedate: "",
-        programcol: ""
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    if (file.fieldname === 'poster') {
+      cb(null, path.join(__dirname, '../public/images'));
+    } else if (file.fieldname === 'video') {
+      cb(null, path.join(__dirname, '../public/videos'));
     }
-    res.render('programForm', { data, href: '/program/new' });
-})
-
-// view single program page with id
-router.get('/view/:id', function (req, res, next) {
-    res.render('singleProgram', { id: req.params.id });
-})
-
-    /* send json all programs/movies */
-router.get('/', function (req, res, next) {
-    try {
-        pool.query("SELECT * FROM program", function (error, result) {
-            if (error) {
-                res.status(500).json({ status: false, message: error.message })
-            }
-            // res.status(200).render("allProducts", result)
-            res.json({ status: true, result })
-        })
-    } catch (error) {
-        res.json({ status: false, error, msg: "hello" })
-    }
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
 });
 
-/* send json details of one id */
-router.get('/:id', function (req, res, next) {
-    // console.log(req.params.id)
-    try {
-        pool.query("SELECT * FROM program WHERE idprogram = ?", [req.params.id], function (error, result) {
-            if (error) {
-                res.status(500).json({ status: false, message: error.message })
-            }
-            // res.status(200).render("singleProduct", result)
-            res.json({ status: true, result })
-        })
-    } catch (error) {
-        res.json({ status: false, error, msg: "hello" })
-    }
+const upload = multer({ storage });
+const { isAuth } = require('./users');
+const router = express.Router();
+
+router.get('/categories', (req, res) => {
+  pool.query('SELECT * FROM category;', (error, result) => {
+    if (error) return res.status(500).json({ status: false, message: error.message });
+    res.json({ status: true, result });
+  });
 });
 
-/* nothing. display a message and single program page */
-router.post('/update/:id', upload.single("poster") ,function (req, res, next) {
-    try {
-        const id = req.params.id
-        let { programname, idcategory, idsubcategory, description, status, casts, releasedate } = req.body
-        const poster = req.file ? req.file.filename : "";
-        
-    
-    
-    if (!idcategory || idcategory === "") {
-        idcategory = 1; // <-- default value
-    }
-    if (!idsubcategory || idsubcategory === "") {
-        idsubcategory = 1; // <-- default value
-    }
-    
-    console.log("update api working", programname, idcategory, idsubcategory, description, status, casts, releasedate, id, poster)
-        // console.log("update api working", id, programname, idcategory, idsubcategory, description, status, casts, releasedate)
-
-        pool.query(`UPDATE program 
-    SET programname = ?, 
-        idcategory = ?, 
-        idsubcategory = ?, 
-        description = ?, 
-        status = ?,
-        casts = ?, 
-        releasedate = ?,
-        poster = ?
-    WHERE idprogram = ?`,
-    [programname, idcategory, idsubcategory, description, status, casts, releasedate, poster, id],
-    function (error, result) {
-        if (error) {
-            res.status(500).json({ status: false, message: error.message })
-        }
-        res.redirect('/program/view/' + id);
-    }
-)
-    } catch (error) {
-        res.json({ status: false, error, msg: "hello" })
-    }
+router.get('/subcategories', (req, res) => {
+  const { categoryId } = req.query;
+  if (!categoryId) return res.status(400).json({ status: false, message: 'Category ID is required' });
+  pool.query('SELECT * FROM subcategory WHERE categoryid = ?', [categoryId], (error, result) => {
+    if (error) return res.status(500).json({ status: false, message: error.message });
+    res.json({ status: true, result });
+  });
 });
 
-/* display a message. and redirect to all programs page */
-router.get('/delete/:id', function (req, res, next) {
-    try {
-        pool.query("DELETE FROM program WHERE idprogram = ?", [req.params.id], function (error, result) {
-            if (error) {
-                res.status(500).json({ status: false, message: error.message })
-            }
-            // redirect to home page
-            res.redirect('/program/view/all');
-            
-        })
-    } catch (error) {
-        res.json({ status: false, error, msg: "hello" })
-    }
+router.get('/view/all', (req, res) => {
+  res.render('allProgram');
 });
 
-/* single program page all fields empty.  */
+router.get('/view/edit/:id', isAuth, (req, res) => {
+  pool.query('SELECT * FROM program WHERE idprogram = ?', [req.params.id], (error, result) => {
+    if (error) return res.status(500).json({ status: false, message: error.message });
+    if (!result[0]) return res.status(404).render('error', { message: 'Program not found' });
+    res.render('programForm', { data: result[0], href: `/program/update/${req.params.id}` });
+  });
+});
 
-router.post('/new', upload.single("poster") ,function (req, res, next) {
-    try {
-        // const id = req.params.id
-        let { programname, idcategory, idsubcategory, description, status, casts, releasedate } = req.body
-        const poster = req.file ? req.file.filename : "";
-    
-    if (!idcategory || idcategory === "") {
-        idcategory = 1; // <-- default value
-    }
-    if (!idsubcategory || idsubcategory === "") {
-        idsubcategory = 1; // <-- default value
-    }
-    
-    console.log("post api working", programname, idcategory, idsubcategory, description, status, casts, releasedate, poster)
-        // console.log("update api working", id, programname, idcategory, idsubcategory, description, status, casts, releasedate)
+router.get('/view/new', isAuth, (req, res) => {
+  const data = {
+    idprogram: '',
+    programname: '',
+    idcategory: '',
+    idsubcategory: '',
+    description: '',
+    status: '',
+    casts: '',
+    poster: '',
+    releasedate: '',
+    programcol: ''
+  };
+  res.render('programForm', { data, href: '/program/new' });
+});
 
-          pool.query("INSERT INTO program ( programname, idcategory, idsubcategory, description, status, casts, releasedate, poster) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+router.get('/view/:id', (req, res) => {
+  res.render('singleProgram', { id: req.params.id });
+});
 
-                                            [programname, idcategory, idsubcategory, description, status, casts, releasedate, poster],
-    function (error, result) {
-        if (error) {
-            res.status(500).json({ status: false, message: error.message })
-        }
+router.get('/', (req, res) => {
+  pool.query('SELECT * FROM program', (error, result) => {
+    if (error) return res.status(500).json({ status: false, message: error.message });
+    res.json({ status: true, result });
+  });
+});
+
+router.get('/:id', (req, res) => {
+  pool.query('SELECT * FROM program WHERE idprogram = ?', [req.params.id], (error, result) => {
+    if (error) return res.status(500).json({ status: false, message: error.message });
+    if (!result[0]) return res.status(404).json({ status: false, message: 'Program not found' });
+    res.json({ status: true, result: result[0] });
+  });
+});
+
+router.post('/update/:id', upload.fields([{ name: 'poster', maxCount: 1 }, { name: 'video', maxCount: 1 }]), isAuth, (req, res) => {
+  try {
+    const id = req.params.id;
+    const { programname, idcategory, idsubcategory, description, status, casts, releasedate } = req.body;
+    const poster = req.files['poster'] ? req.files['poster'][0].filename : '';
+    const video = req.files['video'] ? req.files['video'][0].filename : '';
+    pool.query(
+      'UPDATE program SET programname = ?, idcategory = ?, idsubcategory = ?, description = ?, status = ?, casts = ?, releasedate = ?, poster = ?, video = ? WHERE idprogram = ?',
+      [programname, idcategory || 1, idsubcategory || 1, description, status, casts, releasedate, poster, video, id],
+      (error) => {
+        if (error) return res.status(500).json({ status: false, message: error.message });
+        res.redirect(`/program/view/${id}`);
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ status: false, message: 'Internal server error' });
+  }
+});
+
+router.get('/delete/:id', (req, res) => {
+  pool.query('DELETE FROM program WHERE idprogram = ?', [req.params.id], (error) => {
+    if (error) return res.status(500).json({ status: false, message: error.message });
+    res.redirect('/program/view/all');
+  });
+});
+
+router.post('/new', upload.fields([{ name: 'poster', maxCount: 1 }, { name: 'video', maxCount: 1 }]), isAuth, (req, res) => {
+  try {
+    const { programname, idcategory, idsubcategory, description, status, casts, releasedate } = req.body;
+    const poster = req.files['poster'] ? req.files['poster'][0].filename : '';
+    const video = req.files['video'] ? req.files['video'][0].filename : '';
+    pool.query(
+      'INSERT INTO program (programname, idcategory, idsubcategory, description, status, casts, releasedate, poster, video) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [programname, idcategory || 1, idsubcategory || 1, description, status, casts, releasedate, poster, video],
+      (error) => {
+        if (error) return res.status(500).json({ status: false, message: error.message });
         res.redirect('/program/view/all');
-    }
-)
-    } catch (error) {
-        res.json({ status: false, error, msg: "hello" })
-    }
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ status: false, message: 'Internal server error' });
+  }
 });
 
 module.exports = router;
